@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en" data-brand="sa">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Murat Bugday · Yüksel</title>
+<meta name="description" content="Murat Bugday — Yüksel Saudia. Call, email or save contact.">
+<meta property="og:title" content="Murat Bugday">
+<meta property="og:description" content="Yüksel Saudia · Yüksel Limited — tap to save contact">
+<meta property="og:image" content="https://kahlidoo.github.io/murat-bugday/assets/og.png">
+<meta property="og:type" content="profile">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#F6F5F2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C0C0B" media="(prefers-color-scheme: dark)">
+<meta name="format-detection" content="telephone=no">
+<script>
+  // Brand comes from the QR code that was scanned: ?c=sa (green) or ?c=ltd (red).
+  // Set before first paint so there is no colour flash.
+  (function () {
+    var c = new URLSearchParams(location.search).get("c");
+    document.documentElement.dataset.brand = c === "ltd" ? "ltd" : "sa";
+  })();
+</script>
+<link id="icon" rel="icon" href="assets/favicon-sa.png">
+<link id="touch-icon" rel="apple-touch-icon" href="assets/apple-touch-sa.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F6F5F2;
+    --surface: #FFFFFF;
+    --surface-2: #FAFAF8;
+    --line: rgba(20, 20, 19, 0.08);
+    --line-strong: rgba(20, 20, 19, 0.12);
+    --text: #141413;
+    --text-2: #5F5D58;
+    --text-3: #8C8983;
+    --shadow: 0 1px 1px rgba(20,20,19,.03), 0 2px 4px rgba(20,20,19,.03), 0 12px 32px -8px rgba(20,20,19,.08);
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --radius: 18px;
+  }
+  html[data-brand="sa"]  { --brand: #23925D; --brand-strong: #1A7A4C; --brand-rgb: 35, 146, 93; }
+  html[data-brand="ltd"] { --brand: #EE1C25; --brand-strong: #CF1820; --brand-rgb: 238, 28, 37; }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0C0C0B;
+      --surface: #161615;
+      --surface-2: #1C1C1A;
+      --line: rgba(255, 255, 255, 0.07);
+      --line-strong: rgba(255, 255, 255, 0.11);
+      --text: #F3F2EF;
+      --text-2: #A8A6A0;
+      --text-3: #75736E;
+      --shadow: 0 1px 0 rgba(255,255,255,.03) inset, 0 12px 32px -8px rgba(0,0,0,.6);
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    font-feature-settings: "ss01", "cv11";
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  svg { display: block; flex-shrink: 0; }
+  :focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 10px; }
+
+  .page {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---------- cover ---------- */
+  .cover {
+    position: relative;
+    height: 176px;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 90% at 50% 0%, rgba(var(--brand-rgb), .16), rgba(var(--brand-rgb), .05) 70%),
+      var(--surface-2);
+  }
+  /* faint drafting grid — a nod to construction drawings */
+  .cover::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(var(--brand-rgb), .14) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(var(--brand-rgb), .14) 1px, transparent 1px),
+      linear-gradient(rgba(var(--brand-rgb), .07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(var(--brand-rgb), .07) 1px, transparent 1px);
+    background-size: 96px 96px, 96px 96px, 24px 24px, 24px 24px;
+    background-position: -1px -1px;
+    -webkit-mask-image: radial-gradient(90% 100% at 50% 0%, #000 30%, transparent 85%);
+            mask-image: radial-gradient(90% 100% at 50% 0%, #000 30%, transparent 85%);
+  }
+  .cover::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .share {
+    position: absolute;
+    top: max(14px, env(safe-area-inset-top));
+    right: 14px;
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--surface) 72%, transparent);
+    -webkit-backdrop-filter: blur(12px) saturate(1.4);
+            backdrop-filter: blur(12px) saturate(1.4);
+    box-shadow: 0 0 0 1px var(--line), 0 2px 6px rgba(0,0,0,.04);
+    color: var(--text-2);
+    transition: transform 160ms var(--ease-out), color 160ms ease;
+  }
+  .share:active { transform: scale(0.94); }
+
+  /* ---------- identity ---------- */
+  .identity {
+    position: relative;
+    padding: 0 24px;
+    margin-top: -52px;
+  }
+  .avatar {
+    width: 104px;
+    height: 104px;
+    border-radius: 999px;
+    background: var(--surface);
+    padding: 5px;
+    box-shadow: 0 0 0 1px var(--line), 0 8px 24px -6px rgba(var(--brand-rgb), .35), 0 2px 6px rgba(0,0,0,.06);
+  }
+  /* the logo's letters are transparent cut-outs, so it always sits on white */
+  .avatar img { width: 100%; height: 100%; display: block; border-radius: 999px; background: #fff; }
+
+  h1 {
+    margin: 20px 0 0;
+    font-size: 30px;
+    line-height: 1.1;
+    font-weight: 600;
+    letter-spacing: -0.028em;
+  }
+  .company {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-2);
+    font-size: 15px;
+    letter-spacing: -0.005em;
+  }
+  .company i {
+    width: 6px;
+    height: 6px;
+    border-radius: 2px;
+    background: var(--brand);
+    transform: rotate(45deg);
+  }
+
+  /* ---------- quick actions ---------- */
+  .actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 24px 24px 0;
+  }
+  .action {
+    height: 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border-radius: 16px;
+    background: var(--surface);
+    box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgba(20,20,19,.04);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    transition: transform 160ms var(--ease-out), box-shadow 200ms ease;
+  }
+  .action svg { color: var(--brand); }
+  .action:active { transform: scale(0.97); }
+
+  /* ---------- details ---------- */
+  .label {
+    padding: 28px 24px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .list {
+    margin: 0 24px;
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow), 0 0 0 1px var(--line);
+    overflow: hidden;
+  }
+  .row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 64px;
+    padding: 10px 8px 10px 16px;
+  }
+  .row + .row::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 62px;
+    right: 0;
+    height: 1px;
+    background: var(--line);
+  }
+  .row-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-radius: 10px;
+  }
+  .glyph {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    background: rgba(var(--brand-rgb), .09);
+    color: var(--brand);
+  }
+  .meta { min-width: 0; }
+  .meta small {
+    display: block;
+    font-size: 12.5px;
+    color: var(--text-3);
+    line-height: 1.3;
+  }
+  .meta span {
+    display: block;
+    font-size: 15.5px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-variant-numeric: tabular-nums;
+  }
+  .copy {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    color: var(--text-3);
+    transition: transform 160ms var(--ease-out), color 160ms ease, background-color 160ms ease;
+  }
+  .copy:active { transform: scale(0.9); }
+  .copy .ok { display: none; color: var(--brand); }
+  .copy.done .ok { display: block; animation: pop 320ms var(--ease-out); }
+  .copy.done .idle { display: none; }
+
+  @media (hover: hover) and (pointer: fine) {
+    .share:hover { color: var(--text); }
+    .action:hover { box-shadow: 0 0 0 1px var(--line-strong), 0 4px 12px -4px rgba(20,20,19,.10); }
+    .copy:hover { color: var(--text); background: var(--surface-2); }
+    .row-main:hover span { color: var(--brand-strong); }
+  }
+
+  .spacer { height: 16px; }
+
+  /* ---------- save bar ---------- */
+  .dock {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    padding: 20px 24px max(20px, env(safe-area-inset-bottom));
+    background: linear-gradient(to bottom, transparent, var(--bg) 36%);
+    z-index: 5;
+  }
+  .save {
+    position: relative;
+    width: 100%;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border-radius: 16px;
+    background: var(--brand-strong);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.18),
+      0 0 0 1px rgba(var(--brand-rgb), .9),
+      0 8px 20px -6px rgba(var(--brand-rgb), .55);
+    transition: transform 160ms var(--ease-out), filter 160ms ease;
+  }
+  .save:active { transform: scale(0.98); }
+  @media (hover: hover) and (pointer: fine) { .save:hover { filter: brightness(1.06); } }
+
+  /* ---------- toast ---------- */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(max(20px, env(safe-area-inset-bottom)) + 70px);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px 10px 12px;
+    border-radius: 12px;
+    background: var(--text);
+    color: var(--bg);
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 8px 24px -6px rgba(0,0,0,.25);
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, 8px) scale(0.96);
+    transition: opacity 200ms ease, transform 320ms var(--ease-out);
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
+
+  /* ---------- entrance ---------- */
+  .in {
+    animation: rise 640ms var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 55ms + 60ms);
+  }
+  .avatar.in { animation-name: avatar; }
+  .cover.in { animation: fade 800ms ease both; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(10px); filter: blur(4px); }
+    to   { opacity: 1; transform: none; filter: none; }
+  }
+  @keyframes avatar {
+    from { opacity: 0; transform: scale(0.88); filter: blur(6px); }
+    to   { opacity: 1; transform: none; filter: none; }
+  }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes pop { from { transform: scale(0.5); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .in, .cover.in { animation: fade 200ms ease both; }
+    .toast { transition: opacity 150ms ease; transform: translate(-50%, 0); }
+  }
+
+  /* ---------- larger screens: present as a card ---------- */
+  @media (min-width: 640px) {
+    body { display: grid; place-items: center; padding: 48px 16px; }
+    .page {
+      min-height: auto;
+      border-radius: 28px;
+      overflow: clip;
+      background: var(--bg);
+      box-shadow: 0 0 0 1px var(--line), 0 30px 80px -24px rgba(20,20,19,.22);
+    }
+    .dock { position: static; padding-bottom: 24px; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="cover in" aria-hidden="true"></div>
+
+  <button class="share" type="button" id="share" aria-label="Share this card">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/></svg>
+  </button>
+
+  <section class="identity">
+    <div class="avatar in" style="--i:1">
+      <img id="logo" src="assets/logo-sa.png" width="94" height="94" alt="Yüksel Saudia logo">
+    </div>
+    <h1 class="in" style="--i:2">Murat Bugday</h1>
+    <div class="company in" style="--i:3"><i aria-hidden="true"></i><span data-company>Yüksel Saudia</span></div>
+  </section>
+
+  <nav class="actions" aria-label="Quick actions">
+    <a class="action in" style="--i:4" href="tel:+966112931000">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Call
+    </a>
+    <a class="action in" style="--i:5" href="mailto:mbugday@yuksel.net">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+      Email
+    </a>
+    <a class="action in" style="--i:6" href="https://www.yukselsaudia.com" target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+      Website
+    </a>
+  </nav>
+
+  <div class="label in" style="--i:7">Contact</div>
+  <div class="list in" style="--i:8">
+    <div class="row">
+      <a class="row-main" href="tel:+966112931000">
+        <span class="glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+        <span class="meta"><small>Work</small><span>+966 11 293 1000</span></span>
+      </a>
+      <button class="copy" type="button" data-copy="+966112931000" data-what="Number" aria-label="Copy phone number">
+        <svg class="idle" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="13" height="13" x="9" y="9" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <svg class="ok" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </button>
+    </div>
+    <div class="row">
+      <a class="row-main" href="mailto:mbugday@yuksel.net">
+        <span class="glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+        <span class="meta"><small>Email</small><span>mbugday@yuksel.net</span></span>
+      </a>
+      <button class="copy" type="button" data-copy="mbugday@yuksel.net" data-what="Email" aria-label="Copy email address">
+        <svg class="idle" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="13" height="13" x="9" y="9" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <svg class="ok" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </button>
+    </div>
+    <div class="row">
+      <a class="row-main" href="https://www.yukselsaudia.com" target="_blank" rel="noopener">
+        <span class="glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span>
+        <span class="meta"><small>Website</small><span>yukselsaudia.com</span></span>
+      </a>
+      <button class="copy" type="button" data-copy="https://www.yukselsaudia.com" data-what="Link" aria-label="Copy website address">
+        <svg class="idle" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="13" height="13" x="9" y="9" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <svg class="ok" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </button>
+    </div>
+    <div class="row">
+      <div class="row-main">
+        <span class="glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg></span>
+        <span class="meta"><small>Company</small><span data-company>Yüksel Saudia</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="dock">
+    <a class="save" id="save" href="murat-bugday-sa.vcf">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg>
+      Save contact
+    </a>
+  </div>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+  <span id="toast-text">Copied</span>
+</div>
+
+<script>
+  (function () {
+    var BRANDS = {
+      sa:  { company: "Yüksel Saudia",  theme: "#1A7A4C" },
+      ltd: { company: "Yüksel Limited", theme: "#CF1820" }
+    };
+    var key = document.documentElement.dataset.brand;
+    var b = BRANDS[key];
+
+    document.querySelectorAll("[data-company]").forEach(function (el) { el.textContent = b.company; });
+    var logo = document.getElementById("logo");
+    logo.src = "assets/logo-" + key + ".png";
+    logo.alt = b.company + " logo";
+    document.getElementById("icon").href = "assets/favicon-" + key + ".png";
+    document.getElementById("touch-icon").href = "assets/apple-touch-" + key + ".png";
+    document.getElementById("save").href = "murat-bugday-" + key + ".vcf";
+    document.title = "Murat Bugday · " + b.company;
+
+    var toast = document.getElementById("toast");
+    var toastText = document.getElementById("toast-text");
+    var toastTimer;
+    function notify(msg) {
+      toastText.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { toast.classList.remove("show"); }, 1800);
+    }
+
+    function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+      return new Promise(function (resolve, reject) {
+        var t = document.createElement("textarea");
+        t.value = text;
+        t.setAttribute("readonly", "");
+        t.style.position = "fixed";
+        t.style.opacity = "0";
+        document.body.appendChild(t);
+        t.select();
+        try { document.execCommand("copy") ? resolve() : reject(); } catch (e) { reject(e); }
+        document.body.removeChild(t);
+      });
+    }
+
+    document.querySelectorAll("[data-copy]").forEach(function (btn) {
+      var timer;
+      btn.addEventListener("click", function () {
+        copyText(btn.dataset.copy).then(function () {
+          btn.classList.add("done");
+          notify(btn.dataset.what + " copied");
+          clearTimeout(timer);
+          timer = setTimeout(function () { btn.classList.remove("done"); }, 1600);
+        }, function () { notify("Couldn’t copy"); });
+      });
+    });
+
+    document.getElementById("share").addEventListener("click", function () {
+      var data = { title: "Murat Bugday", text: "Murat Bugday · " + b.company, url: location.href };
+      if (navigator.share) {
+        navigator.share(data).catch(function () {});
+      } else {
+        copyText(location.href).then(function () { notify("Link copied"); });
+      }
+    });
+  })();
+</script>
+</body>
+</html>
