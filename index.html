@@ -10,15 +10,16 @@
 <meta property="og:image" content="https://muratbugday.yukselsaudia.com.sa/assets/og.png">
 <meta property="og:type" content="profile">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#F7F7F5" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0B0B0A" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light">
+<meta id="theme" name="theme-color" content="#ffffff">
 <meta name="format-detection" content="telephone=no">
 <script>
   // Brand comes from the QR code that was scanned: ?c=sa (green) or ?c=ltd (red).
   // Set before first paint so there is no colour flash.
   (function () {
     var c = new URLSearchParams(location.search).get("c");
-    document.documentElement.dataset.brand = c === "ltd" ? "ltd" : "sa";
+    window.BRAND = c === "ltd" ? "ltd" : "sa";
+    document.documentElement.dataset.brand = window.BRAND;
   })();
 </script>
 <link id="icon" rel="icon" href="assets/favicon-sa.png">
@@ -28,256 +29,237 @@
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #F7F7F5;
-    --surface: #FFFFFF;
-    --press: #F2F1EE;
-    --line: rgba(17, 17, 16, 0.07);
-    --line-strong: rgba(17, 17, 16, 0.11);
-    --text: #111110;
-    --text-2: #63615C;
-    --text-3: #9A978F;
+    --page: #FFFFFF;
+    --outside: #F1F1F2;
+    --text: #222327;
+    --text-2: #8A8C95;
+    --icon: #B3B4BB;
+    --line: #ECECEE;
     --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --fab-shadow: 0 10px 14px 1px rgba(0, 0, 0, .14), 0 4px 20px 0 rgba(0, 0, 0, .10);
   }
-  html[data-brand="sa"]  { --brand: #23925D; --brand-strong: #19784A; --brand-rgb: 35, 146, 93; }
-  html[data-brand="ltd"] { --brand: #EE1C25; --brand-strong: #CC161E; --brand-rgb: 238, 28, 37; }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0B0B0A;
-      --surface: #161615;
-      --press: #1F1F1D;
-      --line: rgba(255, 255, 255, 0.07);
-      --line-strong: rgba(255, 255, 255, 0.12);
-      --text: #F4F3F0;
-      --text-2: #A3A19B;
-      --text-3: #6E6C67;
-    }
-  }
+  html[data-brand="sa"]  { --brand: #23925D; --header: #18774A; --brand-rgb: 35, 146, 93; }
+  html[data-brand="ltd"] { --brand: #EE1C25; --header: #C9151D; --brand-rgb: 238, 28, 37; }
 
   *, *::before, *::after { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
+  html { -webkit-text-size-adjust: 100%; background: var(--outside); }
+  html.locked { overflow: hidden; }
   body {
     margin: 0;
     min-height: 100dvh;
-    background: var(--bg);
     color: var(--text);
-    font-family: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
+    font-family: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
     -webkit-font-smoothing: antialiased;
     -webkit-tap-highlight-color: transparent;
   }
   a { color: inherit; text-decoration: none; }
   button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
-  svg { display: block; flex-shrink: 0; }
-  :focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; border-radius: 12px; }
+  svg { display: block; flex-shrink: 0; fill: currentColor; }
+  :focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
 
   .page {
-    width: 100%;
-    max-width: 420px;
+    position: relative;
+    max-width: 440px;
+    min-height: 100dvh;
     margin: 0 auto;
-    padding: max(56px, calc(env(safe-area-inset-top) + 36px)) 20px max(32px, env(safe-area-inset-bottom));
+    background: var(--page);
   }
 
-  /* ---------- identity ---------- */
-  .identity { text-align: center; }
-  .logo {
-    width: 88px;
-    height: 88px;
-    margin: 0 auto;
+  /* ---------- opening screen ---------- */
+  .intro {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    background: #fff;
+    transition: background-color 520ms ease;
+  }
+  .intro.leaving { background-color: rgba(255, 255, 255, 0); pointer-events: none; }
+  .intro-logo {
+    width: 160px;
+    height: 160px;
     border-radius: 999px;
-    background: #fff; /* logo letters are transparent cut-outs */
-    box-shadow:
-      0 0 0 1px var(--line),
-      0 1px 2px rgba(17, 17, 16, .06),
-      0 14px 30px -12px rgba(var(--brand-rgb), .55);
+    animation: intro-in 1700ms var(--ease-in-out) both;
+    will-change: transform;
   }
-  .logo img { width: 100%; height: 100%; display: block; border-radius: 999px; }
-
-  h1 {
-    margin: 24px 0 0;
-    font-size: 32px;
-    line-height: 1.1;
-    font-weight: 600;
-    letter-spacing: -0.032em;
-    text-wrap: balance;
+  @keyframes intro-in {
+    0%   { opacity: 0; transform: scale(0.8); filter: blur(8px); }
+    22%  { opacity: 1; filter: blur(0); }
+    100% { opacity: 1; transform: scale(1); }
   }
-  .company {
-    margin: 10px 0 0;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 15px;
-    color: var(--text-2);
+  /* thin loading bar along the top, as on the original */
+  .bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    overflow: hidden;
+    background: #F2F2F3;
+    transition: opacity 300ms ease;
   }
-  .company i {
-    width: 6px;
-    height: 6px;
-    border-radius: 1.5px;
+  .intro.leaving .bar { opacity: 0; }
+  .bar::before, .bar::after {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
     background: var(--brand);
-    transform: rotate(45deg);
   }
+  .bar::before { animation: bar-long 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite; }
+  .bar::after  { animation: bar-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite; }
+  @keyframes bar-long  { 0% { left: -35%; right: 100%; } 60%, 100% { left: 100%; right: -90%; } }
+  @keyframes bar-short { 0% { left: -200%; right: 100%; } 60%, 100% { left: 107%; right: -8%; } }
 
-  /* ---------- primary actions ---------- */
-  .cta {
-    display: flex;
-    gap: 8px;
-    margin-top: 32px;
+  /* ---------- header ---------- */
+  .header {
+    position: relative;
+    background: var(--header);
+    color: #fff;
+    text-align: center;
+    padding-top: max(40px, calc(env(safe-area-inset-top) + 28px));
   }
-  .save, .share {
-    height: 52px;
-    border-radius: 15px;
+  .avatar {
+    width: 92px;
+    height: 92px;
+    margin: 0 auto;
+    padding: 6px;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 6px 18px -6px rgba(0, 0, 0, .35);
+  }
+  .avatar img { width: 100%; height: 100%; display: block; border-radius: 999px; opacity: 0; }
+  .avatar.ready img { opacity: 1; }
+  h1 {
+    margin: 18px 0 0;
+    padding: 0 24px;
+    font-size: 22px;
+    line-height: 1.2;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .sub {
+    margin: 6px 0 0;
+    font-size: 13.5px;
+    color: rgba(255, 255, 255, .78);
+  }
+  .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-top: 26px;
+    border-top: 1px solid rgba(255, 255, 255, .14);
+  }
+  .action {
+    position: relative;
+    overflow: hidden;
+    height: 66px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    transition: transform 160ms var(--ease-out), filter 160ms ease, background-color 160ms ease;
-  }
-  .save {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-    background: var(--brand-strong);
-    color: #fff;
-    font-size: 16px;
+    gap: 6px;
+    font-size: 10.5px;
     font-weight: 500;
-    letter-spacing: -0.01em;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, .16),
-      inset 0 -1px 0 rgba(0, 0, 0, .08),
-      0 1px 2px rgba(0, 0, 0, .08),
-      0 10px 24px -10px rgba(var(--brand-rgb), .7);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
-  .share {
-    width: 52px;
-    flex: none;
-    background: var(--surface);
-    color: var(--text-2);
-    box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgba(17, 17, 16, .04);
-  }
-  .save:active, .share:active { transform: scale(0.97); }
-
-  /* label swap on tap: old label leaves up, new one arrives from below */
-  .save .label {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    transition: transform 360ms var(--ease-out), opacity 200ms ease, filter 200ms ease;
-  }
-  .save .label + .label { position: absolute; inset: 0; justify-content: center; transform: translateY(18px); opacity: 0; filter: blur(3px); }
-  .save.done .label:first-child { transform: translateY(-18px); opacity: 0; filter: blur(3px); }
-  .save.done .label + .label { transform: none; opacity: 1; filter: none; }
+  .action + .action { border-left: 1px solid rgba(255, 255, 255, .14); }
 
   /* ---------- details ---------- */
-  .list {
-    margin-top: 28px;
-    border-radius: 20px;
-    background: var(--surface);
-    box-shadow:
-      0 0 0 1px var(--line),
-      0 1px 2px rgba(17, 17, 16, .03),
-      0 16px 36px -18px rgba(17, 17, 16, .10);
-    overflow: hidden;
-  }
+  .details { padding: 12px 0 168px; }
   .row {
     position: relative;
+    overflow: hidden;
     display: flex;
     align-items: center;
-    transition: background-color 120ms ease;
+    min-height: 77px;
+    padding: 0 20px;
   }
   .row + .row::before {
     content: "";
     position: absolute;
-    top: 0;
-    left: 64px;
-    right: 0;
+    top: 0; left: 65px; right: 0;
     height: 1px;
     background: var(--line);
   }
-  .row:has(.link:active) { background: var(--press); }
-  .link {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    min-height: 66px;
-    padding: 12px 0 12px 16px;
-  }
-  .glyph {
-    width: 34px;
-    height: 34px;
-    display: grid;
-    place-items: center;
-    border-radius: 10px;
-    background: rgba(var(--brand-rgb), .085);
-    color: var(--brand);
-  }
-  .meta { min-width: 0; text-align: left; }
-  .meta small {
+  .row svg { width: 22px; height: 22px; color: var(--icon); margin-right: 23px; }
+  .row .meta { min-width: 0; }
+  .row b {
     display: block;
-    font-size: 12.5px;
-    line-height: 1.3;
-    color: var(--text-3);
-  }
-  .meta span {
-    display: block;
-    margin-top: 1px;
-    font-size: 15.5px;
+    font-size: 15px;
     font-weight: 500;
-    letter-spacing: -0.012em;
+    letter-spacing: -0.005em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     font-variant-numeric: tabular-nums;
   }
-  .trail {
-    width: 48px;
-    height: 48px;
-    margin-right: 6px;
+  .row small { display: block; margin-top: 2px; font-size: 12.5px; color: var(--text-2); }
+
+  /* ---------- floating buttons ---------- */
+  .fabs {
+    position: fixed;
+    z-index: 20;
+    right: max(18px, calc((100vw - 440px) / 2 + 18px));
+    bottom: max(20px, calc(env(safe-area-inset-bottom) + 14px));
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .fab {
+    position: relative;
+    overflow: hidden;
+    width: 56px;
+    height: 56px;
     display: grid;
     place-items: center;
-    border-radius: 12px;
-    color: var(--text-3);
-    transition: transform 160ms var(--ease-out), color 160ms ease, background-color 160ms ease;
+    border-radius: 999px;
+    box-shadow: var(--fab-shadow);
+    transition: transform 160ms var(--ease-out), box-shadow 200ms ease;
   }
-  button.trail:active { transform: scale(0.9); }
+  .fab:active { transform: scale(0.94); }
+  .fab.share { background: #fff; color: rgba(0, 0, 0, .58); }
+  .fab.add { background: var(--brand); color: #fff; }
+  .fab svg { width: 24px; height: 24px; }
+  /* person-plus ⇄ check after tapping save */
+  .fab.add .swap { position: relative; width: 24px; height: 24px; }
+  .fab.add .swap svg { position: absolute; inset: 0; transition: opacity 180ms ease, transform 300ms var(--ease-out); }
+  .fab.add .swap svg + svg { opacity: 0; transform: scale(0.4) rotate(-45deg); }
+  .fab.add.done .swap svg:first-child { opacity: 0; transform: scale(0.4) rotate(45deg); }
+  .fab.add.done .swap svg + svg { opacity: 1; transform: none; }
 
-  /* copy ⇄ check, cross-faded with a little blur */
-  .swap { position: relative; width: 17px; height: 17px; }
-  .swap svg {
+  /* ---------- touch ripple (material) ---------- */
+  .ripple {
     position: absolute;
-    inset: 0;
-    transition: opacity 180ms ease, transform 300ms var(--ease-out), filter 180ms ease;
+    border-radius: 999px;
+    pointer-events: none;
+    transform: scale(0);
+    opacity: 1;
+    animation: ripple 620ms var(--ease-out) forwards;
   }
-  .swap svg + svg { opacity: 0; transform: scale(0.4); filter: blur(3px); color: var(--brand); }
-  .done .swap svg:first-child { opacity: 0; transform: scale(0.4); filter: blur(3px); }
-  .done .swap svg + svg { opacity: 1; transform: none; filter: none; }
+  @keyframes ripple { to { transform: scale(1); opacity: 0; } }
 
   @media (hover: hover) and (pointer: fine) {
-    .save:hover { filter: brightness(1.07); }
-    .share:hover { color: var(--text); }
-    .row:has(.link:hover) { background: color-mix(in srgb, var(--press) 60%, transparent); }
-    .trail:hover { color: var(--text); background: var(--press); }
+    .action:hover { background: rgba(255, 255, 255, .06); }
+    a.row:hover { background: #FAFAFB; }
+    .fab:hover { box-shadow: 0 14px 22px 1px rgba(0, 0, 0, .16), 0 6px 26px 0 rgba(0, 0, 0, .12); }
   }
 
-  /* ---------- toast ---------- */
+  /* ---------- snackbar ---------- */
   .toast {
     position: fixed;
+    z-index: 30;
     left: 50%;
-    bottom: max(24px, calc(env(safe-area-inset-bottom) + 12px));
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 14px 10px 12px;
-    border-radius: 12px;
-    background: var(--text);
-    color: var(--bg);
+    bottom: max(24px, calc(env(safe-area-inset-bottom) + 18px));
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: #2A2B2F;
+    color: #fff;
     font-size: 14px;
     font-weight: 500;
     white-space: nowrap; /* left:50% halves the shrink-to-fit width; keep the message on one line */
-    box-shadow: 0 10px 30px -8px rgba(0, 0, 0, .3);
+    box-shadow: 0 10px 30px -8px rgba(0, 0, 0, .35);
     pointer-events: none;
     opacity: 0;
     transform: translate(-50%, 10px) scale(0.96);
@@ -285,143 +267,190 @@
   }
   .toast.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
   /* Android: Chrome's own download bar takes the bottom of the screen, so speak from the top */
-  .toast.top { top: max(16px, env(safe-area-inset-top)); bottom: auto; transform: translate(-50%, -10px) scale(0.96); max-width: calc(100vw - 32px); }
+  .toast.top { top: max(16px, env(safe-area-inset-top)); bottom: auto; transform: translate(-50%, -10px) scale(0.96); }
   .toast.top.show { transform: translate(-50%, 0) scale(1); }
 
-  /* ---------- entrance ---------- */
-  .in {
-    animation: rise 700ms var(--ease-out) both;
-    animation-delay: calc(var(--i, 0) * 50ms + 40ms);
-  }
-  .logo.in { animation-name: settle; }
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(8px); filter: blur(4px); }
-    to   { opacity: 1; transform: none; filter: none; }
-  }
-  @keyframes settle {
-    from { opacity: 0; transform: scale(0.9); filter: blur(6px); }
-    to   { opacity: 1; transform: none; filter: none; }
-  }
+  /* ---------- reveal after the opening ---------- */
+  .pre { opacity: 0; }
+  .revealed .pre { animation: rise 620ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 55ms); }
+  .revealed .fab.pre { animation: pop 520ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 70ms + 200ms); }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes pop  { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: none; } }
   @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
   @media (prefers-reduced-motion: reduce) {
-    .in, .logo.in { animation: fade 200ms ease both; }
-    .save .label, .swap svg, .toast { transition-property: opacity; }
-    .toast { transform: translate(-50%, 0); }
+    .intro-logo { animation: fade 300ms ease both; }
+    .revealed .pre, .revealed .fab.pre { animation: fade 200ms ease both; }
+    .ripple { display: none; }
   }
 
-  /* ---------- larger screens: present as a card ---------- */
   @media (min-width: 640px) {
-    body { display: grid; place-items: center; padding: 48px 16px; }
-    .page {
-      padding: 48px 32px 32px;
-      border-radius: 32px;
-      background: var(--bg);
-      box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgba(17,17,16,.04), 0 40px 90px -30px rgba(17, 17, 16, .25);
-    }
+    .page { box-shadow: 0 0 0 1px rgba(0, 0, 0, .04), 0 30px 80px -30px rgba(0, 0, 0, .25); }
   }
 </style>
+<noscript><style>.intro { display: none; } .pre, .avatar img { opacity: 1; }</style></noscript>
 </head>
 <body>
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="bar"></div>
+  <img class="intro-logo" id="intro-logo" alt="">
+</div>
+<script>document.getElementById("intro-logo").src = "assets/logo-" + BRAND + ".png";</script>
+
 <main class="page">
-  <section class="identity">
-    <div class="logo in" style="--i:0">
-      <img id="logo" src="assets/logo-sa.png" width="88" height="88" alt="Yüksel Saudia logo">
-    </div>
-    <h1 class="in" style="--i:1">Murat Bugday</h1>
-    <p class="company in" style="--i:2"><i aria-hidden="true"></i><span data-company>Yüksel Saudia</span></p>
-  </section>
+  <header class="header">
+    <div class="avatar" id="avatar"><img id="logo" width="80" height="80" alt=""></div>
+    <script>
+      var l = document.getElementById("logo");
+      l.src = "assets/logo-" + BRAND + ".png";
+      l.alt = (BRAND === "ltd" ? "Yüksel Limited" : "Yüksel Saudia") + " logo";
+    </script>
+    <h1 class="pre" style="--i:0">Murat Bugday</h1>
+    <p class="sub pre" style="--i:1" data-company>Yüksel Saudia</p>
+    <nav class="actions pre" style="--i:2" aria-label="Quick actions">
+      <a class="action" href="tel:+966112931000" data-ripple="light">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+        Call
+      </a>
+      <a class="action" href="mailto:mbugday@yuksel.net" data-ripple="light">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        Email
+      </a>
+    </nav>
+  </header>
 
-  <div class="cta in" style="--i:3">
-    <a class="save" id="save" href="murat-bugday-sa.vcf">
-      <span class="label">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg>
-        Save contact
-      </span>
-      <span class="label" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-        <span id="save-done">Opening contact</span>
-      </span>
+  <section class="details" aria-label="Contact details">
+    <a class="row pre" style="--i:3" href="tel:+966112931000" data-ripple>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+      <span class="meta"><b>+966 11 293 1000</b><small>Work</small></span>
     </a>
-    <button class="share" type="button" id="share" aria-label="Share this card">
-      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/></svg>
-    </button>
-  </div>
-
-  <div class="list in" style="--i:4">
-    <div class="row">
-      <a class="link" href="tel:+966112931000">
-        <span class="glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
-        <span class="meta"><small>Work phone</small><span>+966 11 293 1000</span></span>
-      </a>
-      <button class="trail" type="button" data-copy="+966112931000" data-what="Number" aria-label="Copy phone number">
-        <span class="swap">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="13" height="13" x="9" y="9" rx="2.5"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-        </span>
-      </button>
+    <a class="row pre" style="--i:4" href="mailto:mbugday@yuksel.net" data-ripple>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      <span class="meta"><b>mbugday@yuksel.net</b><small>Email</small></span>
+    </a>
+    <div class="row pre" style="--i:5">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg>
+      <span class="meta"><b data-company>Yüksel Saudia</b><small>Company</small></span>
     </div>
-    <div class="row">
-      <a class="link" href="mailto:mbugday@yuksel.net">
-        <span class="glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
-        <span class="meta"><small>Email</small><span>mbugday@yuksel.net</span></span>
-      </a>
-      <button class="trail" type="button" data-copy="mbugday@yuksel.net" data-what="Email" aria-label="Copy email address">
-        <span class="swap">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="13" height="13" x="9" y="9" rx="2.5"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-        </span>
-      </button>
-    </div>
-    <div class="row">
-      <a class="link" href="https://www.yukselsaudia.com" target="_blank" rel="noopener">
-        <span class="glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></span>
-        <span class="meta"><small>Website</small><span>yukselsaudia.com</span></span>
-      </a>
-      <span class="trail" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
-      </span>
-    </div>
-    <div class="row">
-      <div class="link">
-        <span class="glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg></span>
-        <span class="meta"><small>Company</small><span data-company>Yüksel Saudia</span></span>
-      </div>
-    </div>
-  </div>
+    <a class="row pre" style="--i:6" href="https://www.yukselsaudia.com" target="_blank" rel="noopener" data-ripple>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+      <span class="meta"><b>yukselsaudia.com</b><small>Website</small></span>
+    </a>
+  </section>
 </main>
 
-<div class="toast" id="toast" role="status" aria-live="polite">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-  <span id="toast-text">Copied</span>
+<div class="fabs">
+  <button class="fab share pre" style="--i:0" type="button" id="share" aria-label="Share this card" data-ripple>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+  </button>
+  <a class="fab add pre" style="--i:1" id="save" href="murat-bugday-sa.vcf" aria-label="Save contact" data-ripple="light">
+    <span class="swap">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+    </span>
+  </a>
 </div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
   (function () {
-    var BRANDS = {
-      sa:  { company: "Yüksel Saudia" },
-      ltd: { company: "Yüksel Limited" }
-    };
-    var key = document.documentElement.dataset.brand;
-    var b = BRANDS[key];
+    var key = window.BRAND;
+    var company = key === "ltd" ? "Yüksel Limited" : "Yüksel Saudia";
+    var root = document.documentElement;
 
-    document.querySelectorAll("[data-company]").forEach(function (el) { el.textContent = b.company; });
-    var logo = document.getElementById("logo");
-    logo.src = "assets/logo-" + key + ".png";
-    logo.alt = b.company + " logo";
+    document.querySelectorAll("[data-company]").forEach(function (el) { el.textContent = company; });
     document.getElementById("icon").href = "assets/favicon-" + key + ".png";
     document.getElementById("touch-icon").href = "assets/apple-touch-" + key + ".png";
-    document.title = "Murat Bugday · " + b.company;
+    document.title = "Murat Bugday · " + company;
 
+    /* ---------- opening: logo grows, then flies into the header avatar ---------- */
+    var intro = document.getElementById("intro");
+    var introLogo = document.getElementById("intro-logo");
+    var avatar = document.getElementById("avatar");
+    var avatarImg = document.getElementById("logo");
+    var theme = document.getElementById("theme");
+    var headerColor = getComputedStyle(root).getPropertyValue("--header").trim();
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // returning to the page (e.g. back from Contacts) should not replay the opening
+    var seen = false;
+    try { seen = Date.now() - Number(sessionStorage.getItem("introSeen") || 0) < 10 * 60 * 1000; } catch (e) {}
+
+    function reveal() {
+      avatar.classList.add("ready");
+      if (intro.parentNode) intro.parentNode.removeChild(intro);
+      root.classList.remove("locked");
+      theme.setAttribute("content", headerColor);
+      document.body.classList.add("revealed");
+      try { sessionStorage.setItem("introSeen", String(Date.now())); } catch (e) {}
+    }
+
+    function flyIntoAvatar() {
+      var from = introLogo.getBoundingClientRect();
+      var to = avatarImg.getBoundingClientRect();
+      var dx = (to.left + to.width / 2) - (from.left + from.width / 2);
+      var dy = (to.top + to.height / 2) - (from.top + from.height / 2);
+      var s = to.width / from.width;
+      intro.classList.add("leaving");
+      theme.setAttribute("content", headerColor);
+      if (!introLogo.animate) { reveal(); return; }
+      introLogo.style.animation = "none";
+      introLogo.animate(
+        [{ transform: "none" }, { transform: "translate(" + dx + "px," + dy + "px) scale(" + s + ")" }],
+        { duration: 760, easing: "cubic-bezier(0.65, 0, 0.35, 1)", fill: "forwards" }
+      ).onfinish = reveal;
+    }
+
+    if (seen) {
+      reveal();
+    } else {
+      root.classList.add("locked");
+      window.scrollTo(0, 0);
+      var start = performance.now();
+      var go = function () {
+        // let the logo finish growing (1.7s) even when the page loads instantly
+        var wait = Math.max(0, (reduce ? 700 : 1750) - (performance.now() - start));
+        setTimeout(reduce ? reveal : flyIntoAvatar, wait);
+      };
+      if (document.readyState === "complete") go(); else window.addEventListener("load", go);
+      setTimeout(function () { if (intro.parentNode) reveal(); }, 6000); // never get stuck behind the opening
+    }
+
+    /* ---------- material ripple on tap ---------- */
+    document.addEventListener("pointerdown", function (e) {
+      var host = e.target.closest("[data-ripple]");
+      if (!host || reduce) return;
+      var r = host.getBoundingClientRect();
+      var size = Math.hypot(Math.max(e.clientX - r.left, r.right - e.clientX), Math.max(e.clientY - r.top, r.bottom - e.clientY)) * 2;
+      var dot = document.createElement("span");
+      dot.className = "ripple";
+      dot.style.width = dot.style.height = size + "px";
+      dot.style.left = (e.clientX - r.left - size / 2) + "px";
+      dot.style.top = (e.clientY - r.top - size / 2) + "px";
+      dot.style.background = host.dataset.ripple === "light" ? "rgba(255,255,255,.32)" : "rgba(0,0,0,.07)";
+      host.appendChild(dot);
+      setTimeout(function () { dot.remove(); }, 650);
+    });
+
+    /* ---------- snackbar ---------- */
+    var toast = document.getElementById("toast");
+    var toastTimer;
+    function notify(msg, ms, top) {
+      toast.textContent = msg;
+      toast.classList.toggle("top", !!top);
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { toast.classList.remove("show"); }, ms || 1800);
+    }
+
+    /* ---------- save contact ---------- */
     // iPhone opens a .vcf straight into Contacts. Android browsers are not allowed to:
     // they always download it first, so give the file a clean name and point at "Open".
     var isAndroid = /Android/i.test(navigator.userAgent);
     var save = document.getElementById("save");
     save.href = "murat-bugday-" + key + ".vcf";
-    if (isAndroid) {
-      save.setAttribute("download", "Murat Bugday.vcf");
-      document.getElementById("save-done").textContent = "Contact downloaded";
-    }
+    if (isAndroid) save.setAttribute("download", "Murat Bugday.vcf");
     var saveTimer;
     save.addEventListener("click", function () {
       save.classList.add("done");
@@ -430,17 +459,7 @@
       if (isAndroid) setTimeout(function () { notify("Now tap “Open” at the bottom", 6000, true); }, 350);
     });
 
-    var toast = document.getElementById("toast");
-    var toastText = document.getElementById("toast-text");
-    var toastTimer;
-    function notify(msg, ms, top) {
-      toastText.textContent = msg;
-      toast.classList.toggle("top", !!top);
-      toast.classList.add("show");
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(function () { toast.classList.remove("show"); }, ms || 1800);
-    }
-
+    /* ---------- share ---------- */
     function copyText(text) {
       if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
       return new Promise(function (resolve, reject) {
@@ -455,25 +474,12 @@
         document.body.removeChild(t);
       });
     }
-
-    document.querySelectorAll("[data-copy]").forEach(function (btn) {
-      var timer;
-      btn.addEventListener("click", function () {
-        copyText(btn.dataset.copy).then(function () {
-          btn.classList.add("done");
-          notify(btn.dataset.what + " copied");
-          clearTimeout(timer);
-          timer = setTimeout(function () { btn.classList.remove("done"); }, 1600);
-        }, function () { notify("Couldn’t copy"); });
-      });
-    });
-
     document.getElementById("share").addEventListener("click", function () {
-      var data = { title: "Murat Bugday", text: "Murat Bugday · " + b.company, url: location.href };
+      var data = { title: "Murat Bugday", text: "Murat Bugday · " + company, url: location.href };
       if (navigator.share) {
         navigator.share(data).catch(function () {});
       } else {
-        copyText(location.href).then(function () { notify("Link copied"); });
+        copyText(location.href).then(function () { notify("Link copied"); }, function () { notify("Couldn’t copy link"); });
       }
     });
   })();
