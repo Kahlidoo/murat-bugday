@@ -79,18 +79,37 @@
     transition: background-color 520ms ease;
   }
   .intro.leaving { background-color: rgba(255, 255, 255, 0); pointer-events: none; }
+  .intro-mark { position: relative; width: 160px; height: 160px; }
   .intro-logo {
+    position: relative;
     width: 160px;
     height: 160px;
     border-radius: 999px;
-    animation: intro-in 1700ms var(--ease-in-out) both;
+    animation: intro-in 2300ms var(--ease-in-out) both;
     will-change: transform;
   }
   @keyframes intro-in {
     0%   { opacity: 0; transform: scale(0.8); filter: blur(8px); }
-    22%  { opacity: 1; filter: blur(0); }
+    18%  { opacity: 1; filter: blur(0); }
     100% { opacity: 1; transform: scale(1); }
   }
+  /* soft brand-coloured rings breathing out from behind the logo */
+  .intro-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: rgba(var(--brand-rgb), .16);
+    opacity: 0;
+    animation: ring 1700ms var(--ease-out) infinite;
+    animation-delay: 450ms;
+  }
+  .intro-ring + .intro-ring { animation-delay: 1300ms; }
+  @keyframes ring {
+    0%   { opacity: 0;   transform: scale(0.9); }
+    15%  { opacity: 1; }
+    100% { opacity: 0;   transform: scale(1.75); }
+  }
+  .intro.leaving .intro-ring { animation: none; opacity: 0; }
   /* thin loading bar along the top, as on the original */
   .bar {
     position: absolute;
@@ -280,6 +299,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .intro-logo { animation: fade 300ms ease both; }
+    .intro-ring { display: none; }
     .revealed .pre, .revealed .fab.pre { animation: fade 200ms ease both; }
     .ripple { display: none; }
   }
@@ -293,7 +313,10 @@
 <body>
 <div class="intro" id="intro" aria-hidden="true">
   <div class="bar"></div>
-  <img class="intro-logo" id="intro-logo" alt="">
+  <div class="intro-mark">
+    <span class="intro-ring"></span><span class="intro-ring"></span>
+    <img class="intro-logo" id="intro-logo" alt="">
+  </div>
 </div>
 <script>document.getElementById("intro-logo").src = "assets/logo-" + BRAND + ".png";</script>
 
@@ -373,9 +396,10 @@
     var headerColor = getComputedStyle(root).getPropertyValue("--header").trim();
     var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // returning to the page (e.g. back from Contacts) should not replay the opening
-    var seen = false;
-    try { seen = Date.now() - Number(sessionStorage.getItem("introSeen") || 0) < 10 * 60 * 1000; } catch (e) {}
+    // The opening plays on every scan, open and refresh. Only coming back with the
+    // Back button (e.g. returning from Contacts) skips it.
+    var nav = performance.getEntriesByType && performance.getEntriesByType("navigation")[0];
+    var seen = !!nav && nav.type === "back_forward";
 
     function reveal() {
       avatar.classList.add("ready");
@@ -383,7 +407,6 @@
       root.classList.remove("locked");
       theme.setAttribute("content", headerColor);
       document.body.classList.add("revealed");
-      try { sessionStorage.setItem("introSeen", String(Date.now())); } catch (e) {}
     }
 
     function flyIntoAvatar() {
@@ -409,8 +432,8 @@
       window.scrollTo(0, 0);
       var start = performance.now();
       var go = function () {
-        // let the logo finish growing (1.7s) even when the page loads instantly
-        var wait = Math.max(0, (reduce ? 700 : 1750) - (performance.now() - start));
+        // let the logo finish growing (2.3s) even when the page loads instantly
+        var wait = Math.max(0, (reduce ? 900 : 2350) - (performance.now() - start));
         setTimeout(reduce ? reveal : flyIntoAvatar, wait);
       };
       if (document.readyState === "complete") go(); else window.addEventListener("load", go);
